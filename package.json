@@ -4,6 +4,7 @@
   "description": "A tool for parsing the playlist of Radio ABC (www.radioabc.dk) and compiling statistics, as well a preparing for import to Spotify playlists",
   "main": "radio.js",
   "scripts": {
+    "start": "node radio.js",
     "test": "mocha"
   },
   "repository": {

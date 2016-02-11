@@ -4,7 +4,7 @@
   "description": "A tool for parsing the playlist of Radio ABC (www.radioabc.dk) and compiling statistics, as well a preparing for import to Spotify playlists",
   "main": "radio.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -23,7 +23,9 @@
   },
   "homepage": "https://github.com/mkholt/radio-scanner#readme",
   "dependencies": {
+    "chai": "3.5.0",
     "htmlparser2": "3.9.0",
+    "mocha": "2.4.5",
     "sqlite3": "3.1.1"
   }
 }

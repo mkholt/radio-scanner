@@ -1,0 +1,25 @@
+{
+  "name": "radio-scanner",
+  "version": "1.0.0",
+  "description": "A tool for parsing the playlist of Radio ABC (www.radioabc.dk) and compiling statistics, as well a preparing for import to Spotify playlists",
+  "main": "radio.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/mkholt/radio-scanner.git"
+  },
+  "keywords": [
+    "radio",
+    "playlist",
+    "spotify",
+    "radio-abc"
+  ],
+  "author": "Morten Holt",
+  "license": "GPL-2.0",
+  "bugs": {
+    "url": "https://github.com/mkholt/radio-scanner/issues"
+  },
+  "homepage": "https://github.com/mkholt/radio-scanner#readme"
+}

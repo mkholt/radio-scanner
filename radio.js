@@ -6,7 +6,7 @@
 
 var http = require('http');
 var parser = require('htmlparser2');
-var init = require('./init');
+var init = require('./lib/init');
 
 var dates = [
     "160205"

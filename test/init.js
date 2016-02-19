@@ -5,7 +5,7 @@
 var should = require('should'),
     sinon = require('sinon'),
     fs = require('fs'),
-    init = require('../init')
+    init = require('../lib/init')
 ;
 require('should-sinon');
 

@@ -16,6 +16,8 @@ var times = [
     "03"
 ];
 
+init.setup();
+
 /*dates.forEach((date) => {
     times.forEach((time) => {
 

@@ -14,36 +14,27 @@ describe('init', function() {
         "use strict";
 
         afterEach(function() {
-            fs.lstat.restore();
-            fs.mkdirSync.restore();
+            fs.mkdir.restore();
         });
 
         it('should create the cache directory when it does not exist', function () {
-            sinon.stub(fs, 'lstat').callsArgWith(1, true);
-            sinon.stub(fs, 'mkdirSync').returns(undefined);
+            sinon.stub(fs, 'mkdir').callsArgWith(2, undefined);
 
             init.setup();
-            fs.lstat.should.be.calledWith(init.settings.cacheDir);
-            fs.mkdirSync.should.be.calledWith(init.settings.cacheDir, init.settings.cacheDirMode);
+            fs.mkdir.should.be.calledWith(init.settings.cacheDir, init.settings.cacheDirMode);
         });
 
         it('should pass if the directory exists', function() {
-            sinon.stub(fs, 'lstat').callsArgWith(1, false, {
-                'isDirectory': () => true
-            });
-            sinon.stub(fs, 'mkdirSync').throws();
+            sinon.stub(fs, 'mkdir').callsArgWith(2, { 'code': 'EEXIST' });
 
             init.setup();
-            fs.mkdirSync.should.not.be.called();
+            fs.mkdir.should.calledWith(init.settings.cacheDir, init.settings.cacheDirMode);
         });
 
-        it('should throw error if not a directory', function() {
-            sinon.stub(fs ,'lstat').callsArgWith(1, false, {
-                'isDirectory': () => false
-            });
-            sinon.stub(fs, 'mkdirSync').throws();
+        it('should throw error otherwise', function() {
+            sinon.stub(fs, 'mkdir').callsArgWith(2, { 'code': 'EERROR' });
 
-            init.setup.should.throw(init.settings.cacheDir + ' is not a directory');
+            init.setup.should.throw('Could not create directory: ' + init.settings.cacheDir + ", ERROR=EERROR");
         })
     });
 });

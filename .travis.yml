@@ -7,4 +7,5 @@ node_js:
   - "5.3"
 
 after_success:
-  - ./bin/codecov -e TRAVIS_NODE_VERSION
+  - istanbul cover ./node_modules/mocha/bin/_mocha -- -R spec \
+      && ./node_modules/.bin/codecov

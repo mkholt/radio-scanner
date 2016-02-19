@@ -6,6 +6,7 @@
 
 var http = require('http');
 var parser = require('htmlparser2');
+var init = require('./init');
 
 var dates = [
     "160205"
@@ -15,9 +16,9 @@ var times = [
     "03"
 ];
 
-dates.forEach((date) => {
+/*dates.forEach((date) => {
     times.forEach((time) => {
-        
+
 
         var body;
         http.request(`http://radioabc.dk/playlist/default.asp?dato=${date}&time=${time}`, (res) => {
@@ -32,5 +33,5 @@ dates.forEach((date) => {
             })
         }).end();
     });
-});
+});*/
 

@@ -62,10 +62,39 @@ describe('fetcher', function() {
             });
         }));
 
-        it("should attempt to fetch the URL, and attempt to write to file", sinon.test(function(done) {
+        it("should attempt to fetch the URL, and attempt to write to file, passing the error", sinon.test(function(done) {
+            var fd = {},
+                writeError = { 'code': 'ENOSP' };
+            this.stub(fs, "open").callsArgWith(2, undefined, fd);
+            this.stub(fs, "writeFile").callsArgWith(2, writeError);
+
+            var request = this.stub(http, "request");
+
+            var expected = "Hello, world!";
+            var response = new PassThrough();
+            response.write(expected);
+            response.end();
+
+            request.callsArgWith(1, response).returns(new PassThrough());
+
+            var cacheFile = init.settings.cacheDir + "/160205-03.html";
+
+            fetcher.fetch("160205", "03", function(err, html) {
+                err.should.eql(writeError);
+                (html == undefined).should.be.true();
+
+                request.should.be.calledWith(init.settings.baseUrl + "?dato=160205&time=03");
+                fs.open.should.be.calledWith(cacheFile);
+                fs.writeFile.should.be.calledWith(cacheFile, expected);
+
+                done();
+            });
+        }));
+
+        it("should attempt to fetch the URL, and attempt to write to file, passing the contents", sinon.test(function(done) {
             var fd = {};
             this.stub(fs, "open").callsArgWith(2, undefined, fd);
-            this.stub(fs, "writeFile").callsArgWith(2, { 'code': 'ENOSP' });
+            this.stub(fs, "writeFile").callsArgWith(2, undefined);
 
             var request = this.stub(http, "request");
 

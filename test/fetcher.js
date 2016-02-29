@@ -15,17 +15,19 @@ var should = require('should'),
 require('should-sinon');
 
 describe('fetcher', function() {
-    var sandbox;
-
-    beforeEach(function() {
-        sandbox = sinon.sandbox.create()
-    });
-
-    afterEach(function() {
-        sandbox.restore();
-    });
-
     describe("fetch", function() {
+        before(function() {
+            sinon.config = {
+                useFakeTimers: false
+            };
+        });
+
+        after(function() {
+            sinon.config = {
+                useFakeTimers: true
+            };
+        });
+
         it("should throw an error when date is empty", function() {
             (function() { fetcher.fetch(); }).should.throw("Date cannot be empty");
         });
@@ -42,46 +44,50 @@ describe('fetcher', function() {
             (function() { fetcher.fetch("160205", 3); }).should.throw("Hour must be a string, 'number' given");
         });
 
-        it("should call with data from file, when date / hour already fetched", function() {
+        it("should call with data from file, when date / hour already fetched", sinon.test(function(done) {
             var openError = { 'code': 'EEXIST' };
-            var expected = fs.readFileSync('./test/fetch-data.html');
+            var expected = "Hello, world!";
 
-            sandbox.stub(fs, "open").callsArgWith(2, openError);
-            sandbox.stub(fs, "readFile").callsArgWith(1, undefined, expected);
+            this.stub(fs, "open").callsArgWith(2, openError);
+            this.stub(fs, "readFile").callsArgWith(1, undefined, expected);
 
             fetcher.fetch("160205", "03", function(err, html) {
                 (err == undefined).should.be.true();
+                html.should.eql(expected);
 
                 fs.open.should.be.called();
                 fs.readFile.should.be.calledWith(init.settings.cacheDir + '/160205-03.html');
 
-                html.should.be.eql(expected);
+                done();
             });
-        });
+        }));
 
-        it("should attempt to fetch the URL, and attempt to write to file", function() {
+        it("should attempt to fetch the URL, and attempt to write to file", sinon.test(function(done) {
             var fd = {};
-            sandbox.stub(fs, "open").callsArgWith(2, undefined, fd);
-            sandbox.stub(fs, "write").callsArgWith(2, { 'code': 'ENOSP' });
+            this.stub(fs, "open").callsArgWith(2, undefined, fd);
+            this.stub(fs, "writeFile").callsArgWith(2, { 'code': 'ENOSP' });
 
-            var request = sandbox.stub(http, "request");
+            var request = this.stub(http, "request");
 
-            var expected = fs.readFileSync('./test/fetch-data.html');
+            var expected = "Hello, world!";
             var response = new PassThrough();
             response.write(expected);
             response.end();
 
             request.callsArgWith(1, response).returns(new PassThrough());
 
+            var cacheFile = init.settings.cacheDir + "/160205-03.html";
+
             fetcher.fetch("160205", "03", function(err, html) {
                 (err == undefined).should.be.true();
+                html.should.eql(expected);
 
                 request.should.be.calledWith(init.settings.baseUrl + "?dato=160205&time=03");
-                fs.open.should.be.calledWith(init.settings.cacheDir + "/160205-03.html");
-                fs.write.should.be.calledWith(fd, expected);
+                fs.open.should.be.calledWith(cacheFile);
+                fs.writeFile.should.be.calledWith(cacheFile, expected);
 
-                html.should.be.eql(expected);
+                done();
             });
-        });
+        }));
     });
 });

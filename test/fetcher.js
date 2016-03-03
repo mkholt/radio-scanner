@@ -14,6 +14,25 @@ var should = require('should'),
     ;
 require('should-sinon');
 
+function stubRequest(expected, error) {
+    var request = this.stub(http, "request");
+    var responseStream = new PassThrough();
+    var requestStream = new PassThrough();
+
+    if (expected) {
+        responseStream.write(expected);
+    }
+    else if (error) {
+        requestStream.emit('error', error);
+    }
+
+    responseStream.end();
+
+    request.callsArgWith(1, responseStream).returns(requestStream);
+
+    return request;
+}
+
 describe('fetcher', function() {
     describe("fetch", function() {
         before(function() {
@@ -68,14 +87,8 @@ describe('fetcher', function() {
             this.stub(fs, "open").callsArgWith(2, undefined, fd);
             this.stub(fs, "writeFile").callsArgWith(2, writeError);
 
-            var request = this.stub(http, "request");
-
             var expected = "Hello, world!";
-            var response = new PassThrough();
-            response.write(expected);
-            response.end();
-
-            request.callsArgWith(1, response).returns(new PassThrough());
+            var request = stubRequest.call(this, expected);
 
             var cacheFile = init.settings.cacheDir + "/160205-03.html";
 
@@ -96,15 +109,8 @@ describe('fetcher', function() {
             this.stub(fs, "open").callsArgWith(2, undefined, fd);
             this.stub(fs, "writeFile").callsArgWith(2, undefined);
 
-            var request = this.stub(http, "request");
-
             var expected = "Hello, world!";
-            var response = new PassThrough();
-            response.write(expected);
-            response.end();
-
-            request.callsArgWith(1, response).returns(new PassThrough());
-
+            var request = stubRequest.call(this, expected);
             var cacheFile = init.settings.cacheDir + "/160205-03.html";
 
             fetcher.fetch("160205", "03", function(err, html) {
@@ -114,6 +120,52 @@ describe('fetcher', function() {
                 request.should.be.calledWith(init.settings.baseUrl + "?dato=160205&time=03");
                 fs.open.should.be.calledWith(cacheFile);
                 fs.writeFile.should.be.calledWith(cacheFile, expected);
+
+                done();
+            });
+        }));
+    });
+
+    describe("getData", function() {
+        before(function() {
+            sinon.config = {
+                useFakeTimers: false
+            };
+        });
+
+        after(function() {
+            sinon.config = {
+                useFakeTimers: true
+            };
+        });
+
+        it("should throw an error when URL is empty", function() {
+            (function() { fetcher.getData() }).should.throw("URL cannot be empty");
+        });
+
+        it("should request from URL", sinon.test(function(done) {
+            var expected = "Hello, world!";
+            var request = stubRequest.call(this, expected);
+
+            fetcher.getData("http://google.com", function(err, body) {
+                (err == undefined).should.be.true();
+                body.should.eql(expected);
+
+                request.should.be.calledWith("http://google.com");
+
+                done();
+            });
+        }));
+
+        it("should pass along error on error", sinon.test(function(done) {
+            var expected = "Hello, world!";
+            var request = stubRequest.call(this, undefined, expected);
+
+            fetcher.getData("http://google.com", (err, body) => {
+                err.should.eql(expected);
+                (body == undefined).should.be.true();
+
+                request.should.be.calledWith("http://google.com");
 
                 done();
             });

@@ -50,4 +50,16 @@ describe('parser', function() {
            });
        }));
    });
+
+    describe("splitTitle", function() {
+
+    });
+
+    describe("parseArtist", function() {
+
+    });
+
+    describe("parseTitle", function() {
+
+    });
 });

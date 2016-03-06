@@ -123,6 +123,25 @@ describe('fetcher', function() {
                 done();
             });
         }));
+
+        it("should pass along error when getData fails", sinon.test(function(done) {
+            var fd = {};
+            this.stub(fs, "open").callsArgWith(2, undefined, fd);
+            this.stub(fs, "writeFile").callsArgWith(2, undefined);
+            var expected = "Hello, world!";
+            var request = stubRequest.call(this);
+
+            fetcher.fetch("160205", "03", function(err, html) {
+                err.should.eql(expected);
+                (html == undefined).should.be.true();
+
+                request.request.should.be.calledWith(init.settings.baseUrl + "?dato=160205&time=03");
+
+                done();
+            });
+
+            request.stream.emit('error', expected);
+        }));
     });
 
     describe("getData", function() {

@@ -14,23 +14,22 @@ var should = require('should'),
     ;
 require('should-sinon');
 
-function stubRequest(expected, error) {
+function stubRequest(expected) {
     var request = this.stub(http, "request");
     var responseStream = new PassThrough();
     var requestStream = new PassThrough();
 
     if (expected) {
         responseStream.write(expected);
+        responseStream.end();
     }
-    else if (error) {
-        requestStream.emit('error', error);
-    }
-
-    responseStream.end();
 
     request.callsArgWith(1, responseStream).returns(requestStream);
 
-    return request;
+    return {
+        'request': request,
+        'stream': requestStream
+    };
 }
 
 describe('fetcher', function() {
@@ -96,7 +95,7 @@ describe('fetcher', function() {
                 err.should.eql(writeError);
                 (html == undefined).should.be.true();
 
-                request.should.be.calledWith(init.settings.baseUrl + "?dato=160205&time=03");
+                request.request.should.be.calledWith(init.settings.baseUrl + "?dato=160205&time=03");
                 fs.open.should.be.calledWith(cacheFile);
                 fs.writeFile.should.be.calledWith(cacheFile, expected);
 
@@ -117,7 +116,7 @@ describe('fetcher', function() {
                 (err == undefined).should.be.true();
                 html.should.eql(expected);
 
-                request.should.be.calledWith(init.settings.baseUrl + "?dato=160205&time=03");
+                request.request.should.be.calledWith(init.settings.baseUrl + "?dato=160205&time=03");
                 fs.open.should.be.calledWith(cacheFile);
                 fs.writeFile.should.be.calledWith(cacheFile, expected);
 
@@ -151,7 +150,7 @@ describe('fetcher', function() {
                 (err == undefined).should.be.true();
                 body.should.eql(expected);
 
-                request.should.be.calledWith("http://google.com");
+                request.request.should.be.calledWith("http://google.com");
 
                 done();
             });
@@ -159,16 +158,18 @@ describe('fetcher', function() {
 
         it("should pass along error on error", sinon.test(function(done) {
             var expected = "Hello, world!";
-            var request = stubRequest.call(this, undefined, expected);
+            var request = stubRequest.call(this);
 
             fetcher.getData("http://google.com", (err, body) => {
                 err.should.eql(expected);
                 (body == undefined).should.be.true();
 
-                request.should.be.calledWith("http://google.com");
+                request.request.should.be.calledWith("http://google.com");
 
                 done();
             });
+
+            request.stream.emit('error', expected);
         }));
     });
 });

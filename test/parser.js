@@ -42,9 +42,38 @@ describe('parser', function() {
            })
        }));
 
+       it("should return empty array when no matches", sinon.test(function(done) {
+          parser.parseHtml("<div>No match</div>", (res) => {
+              res.should.eql([]);
+
+              done();
+          });
+       }));
+
        it("should find divs with bottom margin only", sinon.test(function(done) {
            parser.parseHtml('<div><div style="margin-top: 6px; margin-bottom: 10px; font-weight: bold;"><span>Test</span>Test 2</div><div style="margin-bottom: 2px;"><span>Test 3</span>Test 4</div></div>',  (res) => {
                res.should.eql([
+                   {
+                       'inDiv': false,
+                       'inSpan': false,
+                       'time': 'Test 3',
+                       'song': 'Test 4'
+                   }
+               ]);
+
+               done();
+           });
+       }));
+
+       it("should find multiple songs", sinon.test(function(done) {
+           parser.parseHtml('<div><div style="margin-bottom: 2px;"><span>Test</span>Test 2</div><div style="margin-bottom: 2px;"><span>Test 3</span>Test 4</div></div>',  (res) => {
+               res.should.eql([
+                   {
+                       'inDiv': false,
+                       'inSpan': false,
+                       'time': 'Test',
+                       'song': 'Test 2'
+                   },
                    {
                        'inDiv': false,
                        'inSpan': false,

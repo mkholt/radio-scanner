@@ -51,17 +51,17 @@ describe('parser', function() {
        }));
 
        it("should find divs with bottom margin only", sinon.test(function(done) {
-           var song = "Test 4";
-           parser.parseHtml(`<div><div style="margin-top: 6px; margin-bottom: 10px; font-weight: bold;"><span>Test</span>Test 2</div><div style="margin-bottom: 2px;"><span>Test 3</span>${song}</div></div>`,  (res) => {
+           var song = "";
+           parser.parseHtml('<div><div style="margin-top: 6px; margin-bottom: 10px; font-weight: bold;"><span>Test</span>Test 2</div><div style="margin-bottom: 2px;"><span>Test 3</span>Test 4</div></div>',  (res) => {
                res.should.eql([
                    {
                        'time': 'Test 3',
-                       'song': song
+                       'song': parser.splitTitle('Test 4')
                    }
                ]);
 
                done();
-           });s
+           });
        }));
 
        it("should find multiple songs", sinon.test(function(done) {
@@ -69,11 +69,11 @@ describe('parser', function() {
                res.should.eql([
                    {
                        'time': 'Test',
-                       'song': 'Test 2'
+                       'song': parser.splitTitle('Test 2')
                    },
                    {
                        'time': 'Test 3',
-                       'song': 'Test 4'
+                       'song': parser.splitTitle('Test 4')
                    }
                ]);
 

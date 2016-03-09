@@ -51,31 +51,52 @@ describe('parser', function() {
        }));
 
        it("should find divs with bottom margin only", sinon.test(function(done) {
-           var song = "";
-           parser.parseHtml('<div><div style="margin-top: 6px; margin-bottom: 10px; font-weight: bold;"><span>Test</span>Test 2</div><div style="margin-bottom: 2px;"><span>Test 3</span>Test 4</div></div>',  (res) => {
-               res.should.eql([
-                   {
-                       'time': 'Test 3',
-                       'song': parser.splitTitle('Test 4')
-                   }
-               ]);
+           var song = "Flo Rida feat. Robin Thicke & Verdine Wh - I don't like it, I love it";
+           var songParts = parser.splitTitle(song);
+           var artist = parser.parseArtist(songParts[0]);
+           var expected = [
+               {
+                   'time': 'Test 3',
+                   'song': song,
+                   'artist': artist,
+                   'title': songParts[1]
+               }
+           ];
+
+           parser.parseHtml(`<div><div style="margin-top: 6px; margin-bottom: 10px; font-weight: bold;"><span>Test</span>Test 2</div><div style="margin-bottom: 2px;"><span>Test 3</span>${song}</div></div>`,  (res) => {
+               res.should.eql(expected);
 
                done();
            });
        }));
 
        it("should find multiple songs", sinon.test(function(done) {
-           parser.parseHtml('<div><div style="margin-bottom: 2px;"><span>Test</span>Test 2</div><div style="margin-bottom: 2px;"><span>Test 3</span>Test 4</div></div>',  (res) => {
-               res.should.eql([
-                   {
-                       'time': 'Test',
-                       'song': parser.splitTitle('Test 2')
-                   },
-                   {
-                       'time': 'Test 3',
-                       'song': parser.splitTitle('Test 4')
-                   }
-               ]);
+           var songOne = "Flo Rida feat. Robin Thicke & Verdine Wh - I don't like it, I love it";
+           var songTwo = "Calvin Harris + Disciples - How Deep Is Your Love";
+
+           var songOneParts = parser.splitTitle(songOne);
+           var songTwoParts = parser.splitTitle(songTwo);
+
+           var artistOne = parser.parseArtist(songOneParts[0]);
+           var artistTwo = parser.parseArtist(songTwoParts[0]);
+
+           var expected = [
+               {
+                   'time': 'Test',
+                   'song': songOne,
+                   'artist': artistOne,
+                   'title': songOneParts[1]
+               },
+               {
+                   'time': 'Test 3',
+                   'song': songTwo,
+                   'artist': artistTwo,
+                   'title': songTwoParts[1]
+               }
+           ];
+
+           parser.parseHtml(`<div><div style="margin-bottom: 2px;"><span>Test</span>${songOne}</div><div style="margin-bottom: 2px;"><span>Test 3</span>${songTwo}</div></div>`,  (res) => {
+               res.should.eql(expected);
 
                done();
            });
@@ -102,12 +123,68 @@ describe('parser', function() {
             parser.splitTitle("Long-Artist - Title-Remix").should.eql(["Long-Artist","Title-Remix"]);
             parser.splitTitle("Long-Artist - Title - Remix").should.eql(["Long-Artist","Title - Remix"]);
         });
+
+        it("should split on live data", function() {
+            parser.splitTitle("The Weeknd - Ïn the night").should.eql(["The Weeknd","Ïn the night"]);
+            parser.splitTitle("Calvin Harris + Disciples - How Deep Is Your Love").should.eql(["Calvin Harris + Disciples","How Deep Is Your Love"]);
+            parser.splitTitle("Imagine Dragons - Shots").should.eql(["Imagine Dragons","Shots"]);
+            parser.splitTitle("TooManyLeftHands - Too young to die").should.eql(["TooManyLeftHands","Too young to die"]);
+            parser.splitTitle("Uso feat. Johnson - Supermayn").should.eql(["Uso feat. Johnson","Supermayn"]);
+            parser.splitTitle("Ellie Goulding - Something in the way you move").should.eql(["Ellie Goulding","Something in the way you move"]);
+            parser.splitTitle("Rasmus Seebach - Natteravn").should.eql(["Rasmus Seebach","Natteravn"]);
+            parser.splitTitle("Elle King - Ex's & Oh's").should.eql(["Elle King","Ex's & Oh's"]);
+            parser.splitTitle("ItaloBrothers - Kings & queens").should.eql(["ItaloBrothers","Kings & queens"]);
+            parser.splitTitle("Coldplay - Adventure of a lifetime").should.eql(["Coldplay","Adventure of a lifetime"]);
+            parser.splitTitle("Rasmus Seebach - Uanset (Le Boeuf remix)").should.eql(["Rasmus Seebach","Uanset (Le Boeuf remix)"]);
+            parser.splitTitle("Brandon Beal feat. Lukas Graham - Golden").should.eql(["Brandon Beal feat. Lukas Graham","Golden"]);
+            parser.splitTitle("R. City feat. Adam Levine - Locked away").should.eql(["R. City feat. Adam Levine","Locked away"]);
+            parser.splitTitle("Flo Rida feat. Robin Thicke & Verdine Wh - I don't like it, I love it").should.eql(["Flo Rida feat. Robin Thicke & Verdine Wh","I don't like it, I love it"]);
+            parser.splitTitle("USO feat. Johnson - Supermayn i lommen (Fuck Boy remix)").should.eql(["USO feat. Johnson","Supermayn i lommen (Fuck Boy remix)"]);
+            parser.splitTitle("Charlie Puth featuring Meghan Trainor - Marvin Gaye").should.eql(["Charlie Puth featuring Meghan Trainor","Marvin Gaye"]);
+        });
     });
 
     describe("parseArtist", function() {
+        it("should return the input, when nothing matches", function() {
+            parser.parseArtist("The Weeknd").should.eql({
+                "artist":"The Weeknd",
+                "featuring": []
+            });
+        });
+
+        it("should split on featuring", function() {
+           parser.parseArtist("Brandon Beal feat. Lukas Graham").should.eql({
+               'artist': 'Brandon Beal',
+               'featuring': ['Lukas Graham']
+           });
+
+            parser.parseArtist("R. City feat. Adam Levine").should.eql({
+                'artist': 'R. City',
+                'featuring': ['Adam Levine']
+            });
+
+            parser.parseArtist("Flo Rida feat. Robin Thicke & Verdine Wh").should.eql({
+                'artist': 'Flo Rida',
+                'featuring': ['Robin Thicke','Verdine Wh']
+            });
+
+            parser.parseArtist("Flo Rida feat. Robin Thicke and Verdine Wh").should.eql({
+                'artist': 'Flo Rida',
+                'featuring': ['Robin Thicke','Verdine Wh']
+            });
+
+            parser.parseArtist("Charlie Puth featuring Meghan Trainor").should.eql({
+                'artist': 'Charlie Puth',
+                'featuring': ['Meghan Trainor']
+            });
+
+            parser.parseArtist("Calvin Harris + Disciples").should.eql({
+                'artist': 'Calvin Harris',
+                'featuring': ['Disciples']
+            })
+        });
     });
 
     describe("parseTitle", function() {
-
     });
 });

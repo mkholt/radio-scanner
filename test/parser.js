@@ -295,5 +295,10 @@ describe('parser', function ()
 
 	describe("parseTitle", function ()
 	{
+		it("should return the input, when nothing matches", function() {
+			parser.parseTitle("Ïn the night").should.eql({
+				'title': "Ïn the night"
+			});
+		});
 	});
 });

@@ -265,7 +265,151 @@ describe('parser', function ()
 	{
 		it("should return the input, when nothing matches", function() {
 			parser.parseTitle("Ïn the night").should.eql({
-				'title': "Ïn the night"
+				'title': "Ïn the night",
+				'remix': "",
+				'edit': ""
+			});
+		});
+
+		it("should find remix in parens", function() {
+			parser.parseTitle("Uanset (Le Boeuf remix)").should.eql({
+				'title': "Uanset",
+				'remix': "Le Boeuf remix",
+				'edit': ""
+			});
+
+			parser.parseTitle("Uanset (Le remix Boeuf)").should.eql({
+				'title': "Uanset",
+				'remix': "Le remix Boeuf",
+				'edit': ""
+			});
+
+			parser.parseTitle("Uanset (remix Le Boeuf)").should.eql({
+				'title': "Uanset",
+				'remix': "remix Le Boeuf",
+				'edit': ""
+			});
+
+			parser.parseTitle("Uanset (Remix Le Boeuf)").should.eql({
+				'title': "Uanset",
+				'remix': "Remix Le Boeuf",
+				'edit': ""
+			});
+		});
+
+		it("should find remix after dash", function() {
+			parser.parseTitle("Uanset - Le Boeuf remix").should.eql({
+				'title': "Uanset",
+				'remix': "Le Boeuf remix",
+				'edit': ""
+			});
+
+			parser.parseTitle("Uanset - Le remix Boeuf").should.eql({
+				'title': "Uanset",
+				'remix': "Le remix Boeuf",
+				'edit': ""
+			});
+
+			parser.parseTitle("Uanset - remix Le Boeuf").should.eql({
+				'title': "Uanset",
+				'remix': "remix Le Boeuf",
+				'edit': ""
+			});
+
+			parser.parseTitle("Uanset - Remix Le Boeuf").should.eql({
+				'title': "Uanset",
+				'remix': "Remix Le Boeuf",
+				'edit': ""
+			});
+		});
+
+		it("should find edits in parens", function() {
+			parser.parseTitle("Uanset (Le Boeuf edit)").should.eql({
+				'title': "Uanset",
+				'remix': "",
+				'edit': "Le Boeuf edit"
+			});
+
+			parser.parseTitle("Uanset (Le edit Boeuf)").should.eql({
+				'title': "Uanset",
+				'remix': "",
+				'edit': "Le edit Boeuf"
+			});
+
+			parser.parseTitle("Uanset (edit Le Boeuf)").should.eql({
+				'title': "Uanset",
+				'remix': "",
+				'edit': "edit Le Boeuf"
+			});
+
+			parser.parseTitle("Uanset (Edit Le Boeuf)").should.eql({
+				'title': "Uanset",
+				'remix': "",
+				'edit': "Edit Le Boeuf"
+			});
+		});
+
+		it("should find edits after dash", function() {
+			parser.parseTitle("Uanset - Le Boeuf edit").should.eql({
+				'title': "Uanset",
+				'remix': "",
+				'edit': "Le Boeuf edit"
+			});
+
+			parser.parseTitle("Uanset - Le edit Boeuf").should.eql({
+				'title': "Uanset",
+				'remix': "",
+				'edit': "Le edit Boeuf"
+			});
+
+			parser.parseTitle("Uanset - edit Le Boeuf").should.eql({
+				'title': "Uanset",
+				'remix': "",
+				'edit': "edit Le Boeuf"
+			});
+
+			parser.parseTitle("Uanset - Edit Le Boeuf").should.eql({
+				'title': "Uanset",
+				'remix': "",
+				'edit': "Edit Le Boeuf"
+			});
+		});
+
+		it("should find combined edit and remix", function() {
+			parser.parseTitle("Uanset - Le Boeuf edit (Some Remix)").should.eql({
+				'title': "Uanset",
+				'remix': "Some Remix",
+				'edit': "Le Boeuf edit"
+			});
+
+			parser.parseTitle("Uanset (Le Boeuf edit) (Some Remix)").should.eql({
+				'title': "Uanset",
+				'remix': "Some Remix",
+				'edit': "Le Boeuf edit"
+			});
+
+			parser.parseTitle("Uanset - Le Boeuf edit (Some Remix)").should.eql({
+				'title': "Uanset",
+				'remix': "Some Remix",
+				'edit': "Le Boeuf edit"
+			});
+
+			parser.parseTitle("Uanset (Le Boeuf edit) - Some Remix)").should.eql({
+				'title': "Uanset",
+				'remix': "Some Remix",
+				'edit': "Le Boeuf edit"
+			});
+
+			parser.parseTitle("Uanset - Le Boeuf edit - Some Remix").should.eql({
+				'title': "Uanset",
+				'remix': "Some Remix",
+				'edit': "Le Boeuf edit"
+			});
+
+			parser.parseTitle("Uanset - Some Remix - Le Boeuf edit").should.eql({
+				'title': "Uanset",
+				'remix': "Some Remix",
+				'edit': "Le Boeuf edit"
 			});
 		});
 	});

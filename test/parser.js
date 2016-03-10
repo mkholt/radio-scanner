@@ -51,17 +51,18 @@ describe('parser', function() {
        }));
 
        it("should find divs with bottom margin only", sinon.test(function(done) {
-           var song = "Flo Rida feat. Robin Thicke & Verdine Wh - I don't like it, I love it";
-           var songParts = parser.splitTitle(song);
-           var artist = parser.parseArtist(songParts[0]);
-           var expected = [
-               {
-                   'time': 'Test 3',
-                   'song': song,
-                   'artist': artist,
-                   'title': songParts[1]
-               }
-           ];
+           var song = "Flo Rida feat. Robin Thicke & Verdine Wh - I don't like it, I love it",
+               songParts = parser.splitTitle(song),
+               artist = parser.parseArtist(songParts[0]),
+               title = parser.parseTitle(songParts[1]),
+               expected = [
+                   {
+                       'time': 'Test 3',
+                       'song': song,
+                       'artist': artist,
+                       'title': title
+                   }
+               ];
 
            parser.parseHtml(`<div><div style="margin-top: 6px; margin-bottom: 10px; font-weight: bold;"><span>Test</span>Test 2</div><div style="margin-bottom: 2px;"><span>Test 3</span>${song}</div></div>`,  (res) => {
                res.should.eql(expected);
@@ -80,18 +81,21 @@ describe('parser', function() {
            var artistOne = parser.parseArtist(songOneParts[0]);
            var artistTwo = parser.parseArtist(songTwoParts[0]);
 
+           var titleOne = parser.parseTitle(songOneParts[1]);
+           var titleTwo = parser.parseTitle(songTwoParts[1]);
+
            var expected = [
                {
                    'time': 'Test',
                    'song': songOne,
                    'artist': artistOne,
-                   'title': songOneParts[1]
+                   'title': titleOne
                },
                {
                    'time': 'Test 3',
                    'song': songTwo,
                    'artist': artistTwo,
-                   'title': songTwoParts[1]
+                   'title': titleTwo
                }
            ];
 

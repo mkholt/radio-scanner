@@ -177,38 +177,6 @@ describe('parser', function ()
 			      .should
 			      .eql(["Calvin Harris + Disciples", "How Deep Is Your Love"]);
 
-			parser.splitTitle("Imagine Dragons - Shots")
-			      .should
-			      .eql(["Imagine Dragons", "Shots"]);
-
-			parser.splitTitle("TooManyLeftHands - Too young to die")
-			      .should
-			      .eql(["TooManyLeftHands", "Too young to die"]);
-
-			parser.splitTitle("Uso feat. Johnson - Supermayn")
-			      .should
-			      .eql(["Uso feat. Johnson", "Supermayn"]);
-
-			parser.splitTitle("Ellie Goulding - Something in the way you move")
-			      .should
-			      .eql(["Ellie Goulding", "Something in the way you move"]);
-
-			parser.splitTitle("Rasmus Seebach - Natteravn")
-			      .should
-			      .eql(["Rasmus Seebach", "Natteravn"]);
-
-			parser.splitTitle("Elle King - Ex's & Oh's")
-			      .should
-			      .eql(["Elle King", "Ex's & Oh's"]);
-
-			parser.splitTitle("ItaloBrothers - Kings & queens")
-			      .should
-			      .eql(["ItaloBrothers", "Kings & queens"]);
-
-			parser.splitTitle("Coldplay - Adventure of a lifetime")
-			      .should
-			      .eql(["Coldplay", "Adventure of a lifetime"]);
-
 			parser.splitTitle("Rasmus Seebach - Uanset (Le Boeuf remix)")
 			      .should
 			      .eql(["Rasmus Seebach", "Uanset (Le Boeuf remix)"]);

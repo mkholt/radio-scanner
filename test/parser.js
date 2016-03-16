@@ -375,7 +375,7 @@ describe('parser', function ()
 			});
 		});
 
-		/*it("should find combined edit and remix", function() {
+		it("should find combined edit and remix", function() {
 			parser.parseTitle("Uanset - Le Boeuf edit (Some Remix)").should.eql({
 				'title': "Uanset",
 				'remix': "Some Remix",
@@ -388,13 +388,7 @@ describe('parser', function ()
 				'edit': "Le Boeuf edit"
 			});
 
-			parser.parseTitle("Uanset - Le Boeuf edit (Some Remix)").should.eql({
-				'title': "Uanset",
-				'remix': "Some Remix",
-				'edit': "Le Boeuf edit"
-			});
-
-			parser.parseTitle("Uanset (Le Boeuf edit) - Some Remix)").should.eql({
+			parser.parseTitle("Uanset (Le Boeuf edit) - Some Remix").should.eql({
 				'title': "Uanset",
 				'remix': "Some Remix",
 				'edit': "Le Boeuf edit"
@@ -411,6 +405,6 @@ describe('parser', function ()
 				'remix': "Some Remix",
 				'edit': "Le Boeuf edit"
 			});
-		});*/
+		});
 	});
 });
